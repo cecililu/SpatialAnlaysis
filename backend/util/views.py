@@ -1,25 +1,25 @@
-from django.shortcuts import render
-
-# Create your views here.
+from django.contrib.gis.geos import Point
+from django.contrib.gis.geos import Polygon
+from django.contrib.gis.measure import D
 from django.http import JsonResponse
 from django.views import View
-import osgeo.ogr
-
+import json
 class BufferPolygonView(View):
     def get(self, request, *args, **kwargs):
         lat = float(request.GET.get('lat'))
         lon = float(request.GET.get('lon'))
         buffer_distance = float(request.GET.get('buffer_distance'))
+        point = Point(lon, lat, srid=4326)
+        buffer_polygon = point.buffer(buffer_distance/1000)
 
-        # Create a point using the lat/lon coordinates
-        point = osgeo.ogr.Geometry(osgeo.ogr.wkbPoint)
-        point.AddPoint(lon, lat)
+        # convert the buffer polygon to a geojson-compatible dictionary
+        polygon_geojson = {
+            'type': 'Feature',
+            'geometry': json.loads(buffer_polygon.geojson),
+            'properties': {
+                'point': [lon, lat],
+                'buffer_distance': buffer_distance,
+            }
+        }
 
-        # Create a buffer polygon around the point
-        buffer_polygon = point.Buffer(buffer_distance)
-
-        # Convert the buffer polygon to JSON format
-        polygon_json = buffer_polygon.ExportToJson()
-
-        # Return the buffer polygon as a JSON response
-        return JsonResponse({'polygon': polygon_json})
+        return JsonResponse(polygon_geojson)
