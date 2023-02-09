@@ -10,7 +10,7 @@ class BufferPolygonView(View):
         lon = float(request.GET.get('lon'))
         buffer_distance = float(request.GET.get('buffer_distance'))
         point = Point(lon, lat, srid=4326)
-        buffer_polygon = point.buffer(buffer_distance/1000)
+        buffer_polygon = point.buffer(buffer_distance/100000)
 
         # convert the buffer polygon to a geojson-compatible dictionary
         polygon_geojson = {
