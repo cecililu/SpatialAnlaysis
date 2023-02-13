@@ -37,11 +37,13 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    'django.contrib.gis',
     'rest_framework',
     'rest_framework_simplejwt',
     'rest_framework_gis',
     'django_filters',
     "corsheaders",
+    'utils'
    
 ]
 
@@ -56,6 +58,7 @@ MIDDLEWARE = [
 ]
 
 ROOT_URLCONF = "backend.urls"
+
 
 TEMPLATES = [
     {
