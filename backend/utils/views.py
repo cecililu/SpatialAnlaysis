@@ -16,7 +16,11 @@ class BufferPolygonIntersectionView(APIView):
     def get(self, request):
         print('gettin buildings.... wait')
         lat = float(request.GET.get('lat'))
-        lng = float(request.GET.get('lon'))
+        lng = float(request.GET.get('lng'))
+        # print('bef float',lng)
+        
+        # lng=(float(lng))
+        # print('after float',lng)
         buffer_distance = float(request.GET.get('buffer_distance'))
          
         # point = Point(lng, lat,srid=4326)
@@ -24,13 +28,14 @@ class BufferPolygonIntersectionView(APIView):
         
        
         p4326=Point(lng, lat, srid=4326)
-        print('Point transformned',p4326)
+        print('lat long sent',lng,lat)
+        print('lat long got',p4326)
         ct = CoordTransform(SpatialReference(4326), SpatialReference(3857))
         p3857 = p4326.transform(ct, clone=True)
         buffer_polygon_3857 = p3857.buffer(buffer_distance/100000)
         buffer_polygon_4326 = p4326.buffer(buffer_distance/100000)
         
-        print('Point transformned',p3857)
+        print('Point transformned---->>>>>>',p4326)
       
         # buildings = PlanetOsmPolygon.objects.filter(
         # way__touches=buffer_polygon_4326,
@@ -38,7 +43,6 @@ class BufferPolygonIntersectionView(APIView):
     
         # print('ok')   
  
-
         query = """
     SELECT *
     FROM planet_osm_polygon
@@ -53,22 +57,30 @@ class BufferPolygonIntersectionView(APIView):
       ST_Transform(way, 3857),
       200
     ) AND admin_level is NULL AND building='yes'
-    LIMIT 1000;
+    LIMIT 1000
 """
         with connection.cursor() as cursor:
-            cursor.execute(query, [p4326.x, p4326.y])
+            # cursor.execute("SET enable_seqscan TO off;")
+            # cursor.execute("EXPLAIN ANALYZE " + query, [p4326.x, p4326.y])
+            # explain_result = cursor.fetchall()
+            # print("Query plan:")
+            # for plan in explain_result:
+            #     print(plan)
+            # cursor.execute("SET enable_seqscan TO on;")
+            cursor.execute(query , [p4326.x, p4326.y])
+            rows = cursor.fetchall()
 
-        # Process the results
-            buildings=[] 
-            for row in cursor.fetchall():
-                # Do something with each row
-                way_wkb = row[-1]
-                way_geometry = GEOSGeometry(way_wkb) 
-                buildings.append(way_geometry) 
-        
-        
-        
-        print(buildings,'runned')
+# Process the results
+        buildings = [] 
+        for row in rows:
+            # Do something with each row
+            way_wkb = row[-1]
+            way_geometry = GEOSGeometry(way_wkb) 
+            way_geometryt= way_geometry.transform(4326, clone=True)
+            buildings.append(way_geometryt)
+                
+                
+        # print(buildings,'runned')
         features = []
         for building in buildings:
             # print(building.way,'assasas')
