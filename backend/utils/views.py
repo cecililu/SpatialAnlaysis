@@ -44,28 +44,37 @@ class BufferPolygonIntersectionView(APIView):
         # print('ok')   
  
         query = """
-    SELECT *
-    FROM planet_osm_polygon
-    WHERE ST_DWithin(
-      ST_Transform(
-        ST_SetSRID(
-          ST_Point(%s, %s),
-          4326
-        ),
-        3857
+  SELECT *
+FROM planet_osm_polygon
+WHERE ST_Intersects(
+  way,
+  ST_Transform(
+    ST_MakeEnvelope(85.28460208092133, 27.606122394532917, 85.35535620512481, 27.69326664414035, 4326),
+    3857
+  )
+) AND
+  admin_level IS NULL AND
+  building = 'yes' AND
+  ST_DWithin(
+    ST_Transform(
+      ST_SetSRID(
+        ST_Point(%s, %s),
+        4326
       ),
-      ST_Transform(way, 3857),
-      200
-    ) AND admin_level is NULL AND building='yes'
-    LIMIT 1000
+      3857
+    ),
+    ST_Transform(way, 3857),
+    200
+  )
+LIMIT 1000;
 """
         with connection.cursor() as cursor:
             # cursor.execute("SET enable_seqscan TO off;")
-            # cursor.execute("EXPLAIN ANALYZE " + query, [p4326.x, p4326.y])
-            # explain_result = cursor.fetchall()
-            # print("Query plan:")
-            # for plan in explain_result:
-            #     print(plan)
+            cursor.execute("EXPLAIN ANALYZE " + query, [p4326.x, p4326.y])
+            explain_result = cursor.fetchall()
+            print("Query plan:")
+            for plan in explain_result:
+                print(plan)
             # cursor.execute("SET enable_seqscan TO on;")
             cursor.execute(query , [p4326.x, p4326.y])
             rows = cursor.fetchall()
@@ -75,6 +84,7 @@ class BufferPolygonIntersectionView(APIView):
         for row in rows:
             # Do something with each row
             way_wkb = row[-1]
+            
             way_geometry = GEOSGeometry(way_wkb) 
             way_geometryt= way_geometry.transform(4326, clone=True)
             buildings.append(way_geometryt)
