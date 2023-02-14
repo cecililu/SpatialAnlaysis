@@ -305,3 +305,11 @@ class PlanetOsmRoads(models.Model):
     class Meta:
         managed = False
         db_table = 'planet_osm_roads'
+
+class BuildingData(models.Model):
+    osmdata=models.OneToOneField(PlanetOsmPolygon,on_delete=models.CASCADE)
+    address=models.CharField(max_length=100,blank=True,null=True)
+    phone1 = models.CharField(max_length=20,blank=True,null=True)
+    phone2 = models.CharField(max_length=20,blank=True,null=True)
+    people=models.IntegerField(blank=True,null=True)   
+    

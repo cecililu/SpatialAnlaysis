@@ -64,19 +64,19 @@ WHERE ST_Intersects(
       3857
     ),
     ST_Transform(way, 3857),
-    200
+    %s
   )
-LIMIT 1000;
+LIMIT 10000;
 """
         with connection.cursor() as cursor:
             # cursor.execute("SET enable_seqscan TO off;")
-            cursor.execute("EXPLAIN ANALYZE " + query, [p4326.x, p4326.y])
+            cursor.execute("EXPLAIN ANALYZE " + query, [p4326.x, p4326.y,buffer_distance])
             explain_result = cursor.fetchall()
             print("Query plan:")
             for plan in explain_result:
                 print(plan)
             # cursor.execute("SET enable_seqscan TO on;")
-            cursor.execute(query , [p4326.x, p4326.y])
+            cursor.execute(query , [p4326.x, p4326.y,buffer_distance])
             rows = cursor.fetchall()
 
 # Process the results
@@ -84,23 +84,24 @@ LIMIT 1000;
         for row in rows:
             # Do something with each row
             way_wkb = row[-1]
-            
+            osm_id=row[0]
+            amenities=row[8]
             way_geometry = GEOSGeometry(way_wkb) 
             way_geometryt= way_geometry.transform(4326, clone=True)
-            buildings.append(way_geometryt)
+            buildings.append([way_geometryt,osm_id,amenities])
                 
                 
         # print(buildings,'runned')
         features = []
         for building in buildings:
             # print(building.way,'assasas')
-            geos_polygon = building
+            geos_polygon = building[0]
+            osm_id=building[1]
             # geometry = GEOSGeometry(goes_polygon).json
             feature = {
                 "type": "Feature",
                 "geometry":json.loads(geos_polygon.geojson),
-            
-                "properties": {}
+                "properties": {"osm_id":osm_id,"amenities":building[2]}
             }
             features.append(feature)
         
