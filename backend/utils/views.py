@@ -139,3 +139,24 @@ class BufferPolygonView(View):
         }
 
         return JsonResponse(polygon_geojson)
+      
+
+from rest_framework.response import Response
+from .models import Building, BuildingAttributeInformationModel
+from .sereializer import BuildingAttributeInformationSerializer
+
+class CreateBuildingAttributeInfo(APIView):
+  
+    def post(self, request):
+        osm_id = request.data.get('osm_id')
+        try:
+            building = Building.objects.get(osm_id=osm_id)
+        except Building.DoesNotExist:
+            return Response({'message': 'Building not found'}, status=404)
+        serializer = BuildingAttributeInformationSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.validated_data['building'] = building
+            serializer.save()
+            return Response({'message': 'Building attribute information created successfully'}, status=201)
+        else:
+            return Response(serializer.errors, status=400)

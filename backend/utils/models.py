@@ -312,4 +312,11 @@ class BuildingData(models.Model):
     phone1 = models.CharField(max_length=20,blank=True,null=True)
     phone2 = models.CharField(max_length=20,blank=True,null=True)
     people=models.IntegerField(blank=True,null=True)   
-    
+
+class BuildingAttributeInformationModel(models.Model):
+    house_metric_number = models.CharField(primary_key=True, max_length=50)
+    # Add any other fields for the BuildingAttributeInformationModel model here
+    building = models.ForeignKey(PlanetOsmPolygon, on_delete=models.CASCADE)
+    address=models.CharField(max_length=100,blank=True,null=True)
+    phone1 = models.CharField(max_length=20,blank=True,null=True)
+    phone2 = models.CharField(max_length=20,blank=True,null=True)
