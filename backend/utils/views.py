@@ -69,13 +69,13 @@ WHERE ST_Intersects(
 LIMIT 10000;
 """
         with connection.cursor() as cursor:
-            # cursor.execute("SET enable_seqscan TO off;")
+           
             cursor.execute("EXPLAIN ANALYZE " + query, [p4326.x, p4326.y,buffer_distance])
             explain_result = cursor.fetchall()
             print("Query plan:")
             for plan in explain_result:
                 print(plan)
-            # cursor.execute("SET enable_seqscan TO on;")
+            
             cursor.execute(query , [p4326.x, p4326.y,buffer_distance])
             rows = cursor.fetchall()
 
@@ -91,13 +91,13 @@ LIMIT 10000;
             buildings.append([way_geometryt,osm_id,amenities])
                 
                 
-        # print(buildings,'runned')
+        
         features = []
         for building in buildings:
-            # print(building.way,'assasas')
+          
             geos_polygon = building[0]
             osm_id=building[1]
-            # geometry = GEOSGeometry(goes_polygon).json
+          
             feature = {
                 "type": "Feature",
                 "geometry":json.loads(geos_polygon.geojson),
