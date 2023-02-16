@@ -141,7 +141,7 @@ class BufferPolygonView(View):
         return JsonResponse(polygon_geojson)
       
 
-from rest_framework.response import Response
+# from rest_framework.response import Response
 from .models import  BuildingAttributeInformationModel
 from .sereializer import BuildingAttributeInformationSerializer
 
@@ -149,14 +149,21 @@ class CreateBuildingAttributeInfo(APIView):
   
     def post(self, request):
         osm_id = request.data.get('osm_id')
+        hsn = request.data.get('house_metric_number')
+        
+        print('Iam OSM ID---->',osm_id)
+        
         try:
             building = PlanetOsmPolygon.objects.get(osm_id=osm_id)
         except PlanetOsmPolygon.DoesNotExist:
             return Response({'message': 'Building not found'}, status=404)
-        serializer = BuildingAttributeInformationSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.validated_data['building'] = building
-            serializer.save()
-            return Response({'message': 'Building attribute information created successfully'}, status=201)
-        else:
-            return Response(serializer.errors, status=400)
+        
+        try:
+           serializer = BuildingAttributeInformationSerializer(building=builddata,house_metric_number=hsn)
+           if serializer.is_valid():
+            #  serializer.validated_data['building'] = building
+             serializer.save()
+             return Response({'message': 'Building attribute information created successfully'}, status=201)
+        # else:
+        except:
+            return Response('Data could not be added check your data', status=400)
