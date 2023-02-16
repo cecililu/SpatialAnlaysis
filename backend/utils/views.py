@@ -142,7 +142,7 @@ class BufferPolygonView(View):
       
 
 from rest_framework.response import Response
-from .models import Building, BuildingAttributeInformationModel
+from .models import  BuildingAttributeInformationModel
 from .sereializer import BuildingAttributeInformationSerializer
 
 class CreateBuildingAttributeInfo(APIView):
@@ -150,8 +150,8 @@ class CreateBuildingAttributeInfo(APIView):
     def post(self, request):
         osm_id = request.data.get('osm_id')
         try:
-            building = Building.objects.get(osm_id=osm_id)
-        except Building.DoesNotExist:
+            building = PlanetOsmPolygon.objects.get(osm_id=osm_id)
+        except PlanetOsmPolygon.DoesNotExist:
             return Response({'message': 'Building not found'}, status=404)
         serializer = BuildingAttributeInformationSerializer(data=request.data)
         if serializer.is_valid():
