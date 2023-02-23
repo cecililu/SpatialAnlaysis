@@ -53,8 +53,8 @@ WHERE ST_Intersects(
     3857
   )
 ) AND
-  admin_level IS NULL AND
-  building = 'yes' AND
+ 
+  building = 'yes'  AND
   ST_DWithin(
     ST_Transform(
       ST_SetSRID(
@@ -85,7 +85,7 @@ LIMIT 10000;
             # Do something with each row
             way_wkb = row[-1]
             osm_id=row[0]
-            amenities=row[8]
+            amenities=row[2]
             way_geometry = GEOSGeometry(way_wkb) 
             way_geometryt= way_geometry.transform(4326, clone=True)
             buildings.append([way_geometryt,osm_id,amenities])
@@ -97,7 +97,7 @@ LIMIT 10000;
           
             geos_polygon = building[0]
             osm_id=building[1]
-          
+            print('asdads',geos_polygon.geojson)
             feature = {
                 "type": "Feature",
                 "geometry":json.loads(geos_polygon.geojson),
@@ -142,28 +142,45 @@ class BufferPolygonView(View):
       
 
 # from rest_framework.response import Response
-from .models import  BuildingAttributeInformationModel
-from .sereializer import BuildingAttributeInformationSerializer
+# from .models import  BuildingAttributeInformationModel
+# from .sereializer import BuildingAttributeInformationSerializer
 
-class CreateBuildingAttributeInfo(APIView):
+# class CreateBuildingAttributeInfo(APIView):
   
+#     def post(self, request):
+#         osm_id = request.data.get('osm_id')
+#         hsn = request.data.get('house_metric_number')
+        
+#         print('Iam OSM ID---->',osm_id)
+        
+#         try:
+#             building = PlanetOsmPolygon.objects.get(osm_id=osm_id)
+#         except PlanetOsmPolygon.DoesNotExist:
+#             return Response({'message': 'Building not found'}, status=404)
+        
+#         try: 
+#            serializer = BuildingAttributeInformationSerializer(building=building,house_metric_number=hsn)
+#            if serializer.is_valid():
+#             #  serializer.validated_data['building'] = building
+#              serializer.save()
+#              return Response({'message': 'Building attribute information created successfully'}, status=201)
+#         # else:
+#         except:
+#             return Response('Data could not be added check your data', status=400)
+
+
+# add new building data
+
+from .sereializer import *
+class BuildingdataPost(APIView):
     def post(self, request):
-        osm_id = request.data.get('osm_id')
-        hsn = request.data.get('house_metric_number')
-        
-        print('Iam OSM ID---->',osm_id)
-        
-        try:
-            building = PlanetOsmPolygon.objects.get(osm_id=osm_id)
-        except PlanetOsmPolygon.DoesNotExist:
-            return Response({'message': 'Building not found'}, status=404)
-        
-        try:
-           serializer = BuildingAttributeInformationSerializer(building=builddata,house_metric_number=hsn)
-           if serializer.is_valid():
-            #  serializer.validated_data['building'] = building
-             serializer.save()
-             return Response({'message': 'Building attribute information created successfully'}, status=201)
-        # else:
-        except:
-            return Response('Data could not be added check your data', status=400)
+        data = request.data
+        osm_id = data.get('osm_id')
+        way = data.get('way')
+        ogr_geometry = GEOSGeometry(way)
+       
+        building = data.get('building') 
+        planet_osm_polygon = PlanetOsmPolygon(osm_id=osm_id, way=ogr_geometry, building=building)
+        planet_osm_polygon.save()
+        serializer = osmBuilding(planet_osm_polygon)
+        return Response(serializer.data)

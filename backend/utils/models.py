@@ -306,17 +306,17 @@ class PlanetOsmRoads(models.Model):
         managed = False
         db_table = 'planet_osm_roads'
 
-class BuildingData(models.Model):
-    osmdata=models.OneToOneField(PlanetOsmPolygon,on_delete=models.CASCADE)
-    address=models.CharField(max_length=100,blank=True,null=True)
-    phone1 = models.CharField(max_length=20,blank=True,null=True)
-    phone2 = models.CharField(max_length=20,blank=True,null=True)
-    people=models.IntegerField(blank=True,null=True)   
+# class BuildingData(models.Model):
+#     osmdata=models.OneToOneField(PlanetOsmPolygon,on_delete=models.CASCADE,to_field='osm_id')
+#     address=models.CharField(max_length=100,blank=True,null=True)
+#     phone1 = models.CharField(max_length=20,blank=True,null=True)
+#     phone2 = models.CharField(max_length=20,blank=True,null=True)
+#     people=models.IntegerField(blank=True,null=True)   
 
-class BuildingAttributeInformationModel(models.Model):
-    house_metric_number = models.CharField(primary_key=True, max_length=50)
-    # Add any other fields for the BuildingAttributeInformationModel model here
-    building = models.ForeignKey(PlanetOsmPolygon, on_delete=models.CASCADE)
-    address=models.CharField(max_length=100,blank=True,null=True)
-    phone1 = models.CharField(max_length=20,blank=True,null=True)
-    phone2 = models.CharField(max_length=20,blank=True,null=True)
+# class BuildingAttributeInformationModels(models.Model):
+#     house_metric_number = models.CharField(primary_key=True, max_length=50)
+#     # Add any other fields for the BuildingAttributeInformationModel model here
+#     building = models.ForeignKey(PlanetOsmPolygon, on_delete=models.CASCADE,to_field='osm_id',null=True)
+#     address=models.CharField(max_length=100,blank=True,null=True)
+#     phone1 = models.CharField(max_length=20,blank=True,null=True)
+#     phone2 = models.CharField(max_length=20,blank=True,null=True)
