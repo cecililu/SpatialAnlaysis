@@ -2,7 +2,7 @@ from django.contrib.gis.db import models
 # Create your models here.
 
 class PlanetOsmLine(models.Model):
-    osm_id = models.BigIntegerField(blank=True, primary_key=True)
+    osm_id = models.BigIntegerField(primary_key=True,unique=True),
     access = models.TextField(blank=True, null=True)
     addr_housename = models.TextField(db_column='addr:housename', blank=True, null=True)  # Field renamed to remove unsuitable characters.
     addr_housenumber = models.TextField(db_column='addr:housenumber', blank=True, null=True)  # Field renamed to remove unsuitable characters.
@@ -156,7 +156,7 @@ class PlanetOsmPoint(models.Model):
 
 class PlanetOsmPolygon(models.Model):
     
-    osm_id = models.BigIntegerField(blank=True,primary_key=True)
+    osm_id = models.BigIntegerField(blank=True,primary_key=True,unique=True)
     access = models.TextField(blank=True, null=True)
     addr_housename = models.TextField(db_column='addr:housename', blank=True, null=True)  # Field renamed to remove unsuitable characters.
     addr_housenumber = models.TextField(db_column='addr:housenumber', blank=True, null=True)  # Field renamed to remove unsuitable characters.
@@ -232,7 +232,7 @@ class PlanetOsmPolygon(models.Model):
 
 
 class PlanetOsmRoads(models.Model):
-    osm_id = models.BigIntegerField(blank=True, null=True)
+    osm_id = models.BigIntegerField(primary_key=True)
     access = models.TextField(blank=True, null=True)
     addr_housename = models.TextField(db_column='addr:housename', blank=True, null=True)  # Field renamed to remove unsuitable characters.
     addr_housenumber = models.TextField(db_column='addr:housenumber', blank=True, null=True)  # Field renamed to remove unsuitable characters.
@@ -320,3 +320,26 @@ class PlanetOsmRoads(models.Model):
 #     address=models.CharField(max_length=100,blank=True,null=True)
 #     phone1 = models.CharField(max_length=20,blank=True,null=True)
 #     phone2 = models.CharField(max_length=20,blank=True,null=True)
+
+# class Data(models.Model):
+#     house_metric_number = models.CharField(primary_key=True, max_length=100)
+#     address = models.CharField(max_length=100, blank=True, null=True)
+#     phone1 = models.CharField(max_length=20, blank=True, null=True)
+#     phone2 = models.CharField(max_length=20, blank=True, null=True)
+#     building_id = models.OneToOneField(
+#         PlanetOsmPolygon,
+#         blank=True,
+#         null=True,
+#         on_delete=models.CASCADE,
+#         to_field='osm_id' # specify the name of the column to use as the reference
+#     )
+class Data(models.Model):
+    house_metric_number = models.CharField(primary_key=True, max_length=100)
+    address = models.CharField(max_length=100, blank=True, null=True)
+    phone1 = models.CharField(max_length=20, blank=True, null=True)
+    phone2 = models.CharField(max_length=20, blank=True, null=True)
+    building = models.ForeignKey('PlanetOsmPolygon', models.DO_NOTHING, blank=True, null=True)
+
+    class Meta:
+        managed = False
+        db_table = 'data'

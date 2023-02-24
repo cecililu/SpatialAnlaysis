@@ -24,8 +24,6 @@ class BufferPolygonIntersectionView(APIView):
         buffer_distance = float(request.GET.get('buffer_distance'))
          
         # point = Point(lng, lat,srid=4326)
-        
-        
        
         p4326=Point(lng, lat, srid=4326)
         print('lat long sent',lng,lat)
@@ -195,6 +193,13 @@ class BuildingdataPost(APIView):
         
         # building_attrs = data.get('building_attrs', {})
         building = PlanetOsmPolygon.objects.create(osm_id=osm_id, way=ogr_geometry, building=building)
-        # building_attr_info = BuildingAttributeInformationModel.objects.create(building=building, **building_attrs)
+        
+        address = data.get('address')
+        phone1 = data.get('phone1')
+        phone2 = data.get('phone2')
+        house_metric_number=data.get('house_metric_number')
+        
+        building_attr_info = Data.objects.create(house_metric_number=house_metric_number,building=building,address=address,phone1=phone1,phone2=phone2)
+       
         print('ok') 
         return Response({'message': 'Building data created successfully.'})
