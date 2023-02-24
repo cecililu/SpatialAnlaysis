@@ -339,7 +339,9 @@ class Data(models.Model):
     phone1 = models.CharField(max_length=20, blank=True, null=True)
     phone2 = models.CharField(max_length=20, blank=True, null=True)
     building = models.ForeignKey('PlanetOsmPolygon', models.DO_NOTHING, blank=True, null=True)
+    people = models.IntegerField(blank=True, null=True)
 
     class Meta:
         managed = False
         db_table = 'data'
+

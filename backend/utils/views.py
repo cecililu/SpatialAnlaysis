@@ -177,7 +177,7 @@ class BuildingdataPost(APIView):
   
     def post(self, request):
         data = request.data
-        osm_id = data.get('osm_id')
+        osm_id = int(data.get('osm_id'))
         way = data.get('way')
         building=data.get('building')
         coords_str = way.split("((")[1].split("))")[0]
@@ -198,8 +198,9 @@ class BuildingdataPost(APIView):
         phone1 = data.get('phone1')
         phone2 = data.get('phone2')
         house_metric_number=data.get('house_metric_number')
+        people=int(data.get('people'))
         
-        building_attr_info = Data.objects.create(house_metric_number=house_metric_number,building=building,address=address,phone1=phone1,phone2=phone2)
+        building_attr_info = Data.objects.create(people=people,house_metric_number=house_metric_number,building=building,address=address,phone1=phone1,phone2=phone2)
        
         print('ok') 
         return Response({'message': 'Building data created successfully.'})
