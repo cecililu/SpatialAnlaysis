@@ -224,7 +224,7 @@ class PlanetOsmPolygon(models.Model):
     wood = models.TextField(blank=True, null=True)
     z_order = models.IntegerField(blank=True, null=True)
     way_area = models.FloatField(blank=True, null=True)
-    way = models.GeometryField(blank=True, null=True)
+    way = models.GeometryField(blank=True, null=True,srid=3857)
 
     class Meta:
         managed = False

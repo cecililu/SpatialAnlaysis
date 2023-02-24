@@ -97,7 +97,7 @@ LIMIT 10000;
           
             geos_polygon = building[0]
             osm_id=building[1]
-            print('asdads',geos_polygon.geojson)
+            # print('asdads',geos_polygon.geojson)
             feature = {
                 "type": "Feature",
                 "geometry":json.loads(geos_polygon.geojson),
@@ -172,15 +172,29 @@ class BufferPolygonView(View):
 # add new building data
 
 from .sereializer import *
+from osgeo import ogr, osr
+
+
 class BuildingdataPost(APIView):
+  
     def post(self, request):
         data = request.data
         osm_id = data.get('osm_id')
         way = data.get('way')
-        ogr_geometry = GEOSGeometry(way)
-       
-        building = data.get('building') 
-        planet_osm_polygon = PlanetOsmPolygon(osm_id=osm_id, way=ogr_geometry, building=building)
-        planet_osm_polygon.save()
-        serializer = osmBuilding(planet_osm_polygon)
-        return Response(serializer.data)
+        building=data.get('building')
+        coords_str = way.split("((")[1].split("))")[0]
+        coords = [c.strip().split(" ") for c in coords_str.split(",")]
+        coords.append(coords[0])
+        new_coords_str = ",".join([" ".join(c) for c in coords])
+        output_wkt = f"POLYGON(({new_coords_str}))"
+        print('cliet',output_wkt) 
+        
+        ogr_geometry = GEOSGeometry(output_wkt, srid=4326)
+        ogr_geometry.transform(3857)
+        print('--->',ogr_geometry)
+        
+        # building_attrs = data.get('building_attrs', {})
+        building = PlanetOsmPolygon.objects.create(osm_id=osm_id, way=ogr_geometry, building=building)
+        # building_attr_info = BuildingAttributeInformationModel.objects.create(building=building, **building_attrs)
+        print('ok') 
+        return Response({'message': 'Building data created successfully.'})
