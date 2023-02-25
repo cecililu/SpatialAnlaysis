@@ -4,7 +4,7 @@ from .models import *
 class DataSerializer(serializers.ModelSerializer):
     class Meta:
         model = Data
-        fields = "__all__"
+        fields ="__all__"
         
                 
 class osmBuilding(serializers.ModelSerializer):

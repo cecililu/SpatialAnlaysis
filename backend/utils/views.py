@@ -213,7 +213,24 @@ from .sereializer import DataSerializer
 
 class BuildingInfo(APIView):
     def get(self, request):
+        print('request for building data')
         osm_id = int(request.GET.get('osm_id'))
-        data = Data.objects.filter(osm_id=osm_id)
-        serializer = DataSerializer(data)
+        # print('osmid',osm_id)
+        data = Data.objects.filter(building=osm_id)
+        # serializer = DataSerializer(data)
+        # print(data.building)
+        # print(data.address)
+        # print(data.phone1)
+        # print(data.phone2)
+        # print(data.people)
+
+        # print (data.people)
+        serializer = DataSerializer(data,many=True)
+        print(serializer.data)
+        obj_list = list(data)
+        print(obj_list)
         return Response(serializer.data)
+        
+        
+        print("ok")
+        return Response('ok')
