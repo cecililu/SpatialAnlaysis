@@ -204,3 +204,16 @@ class BuildingdataPost(APIView):
        
         print('ok') 
         return Response({'message': 'Building data created successfully.'})
+
+
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from .models import Data
+from .sereializer import DataSerializer
+
+class BuildingInfo(APIView):
+    def get(self, request):
+        osm_id = int(request.GET.get('osm_id'))
+        data = Data.objects.filter(osm_id=osm_id)
+        serializer = DataSerializer(data)
+        return Response(serializer.data)
